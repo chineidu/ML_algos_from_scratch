@@ -1,8 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
+
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
+
 from linear_regression import LinearRegression
 
 
@@ -17,6 +19,7 @@ def cal_mse(y_true, y_pred):
 # plt.show()
 
 def run():
+    """Run the entire file"""
     # create a synthetic data
     data = make_regression(n_samples=300, n_features=1, noise=27, random_state=4)
     X, y = data
@@ -34,7 +37,6 @@ def run():
     y_pred = lin_reg.predict(X_test)
 
     mse = cal_mse(y_test, y_pred)
-
     return mse
 
 
