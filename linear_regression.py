@@ -31,5 +31,7 @@ class LinearRegression:
         return y_pred
     
     def _mse(self, y_true: np.array, y_pred: np.array) -> float:
-        mse = np.mean(np.square(y_true - y_pred))
-        return mse
+	    """Calculate the Mean Squared Error of the model."""
+	    mse = np.mean(np.square(y_true - y_pred))
+	    return mse
+		

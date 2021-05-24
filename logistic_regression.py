@@ -37,6 +37,7 @@ class LogisticRegression:
         return 1 / (1 + np.exp(-val))
     
     def _accuracy(self,  y_true: np.array, y_pred: np.array) -> float:
+        """Calculate the model accuracy."""
         acc = np.sum(y_true == y_pred) / len(y_true)
         return round(acc, 2)
 
