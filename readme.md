@@ -19,4 +19,4 @@ This is also called **Logit model** and it is used to model the probability of a
 It is similiar to linear regression but the major difference is that a **sigmoid function** is used to convert the values obtained from the linear model to values between 0 and 1.
 ![logistic](https://i.postimg.cc/FH1mH9N1/logistic.jpg)
 
-* The weights and bias are frequently updatated until the best/minimum values are obtained.
+* The weights and bias are frequently updated until the best/minimum values are obtained.
