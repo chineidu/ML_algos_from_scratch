@@ -44,7 +44,7 @@ class LinearRegression:
 
     def predict(self, X: np.ndarray) -> float:
         """This is used to make predictions."""
-        # Step6. Use the update parameters to make predictions.
+        # Step5. Use the update parameters to make predictions.
         y_pred = np.dot(X, self.weight) + self.bias
         return y_pred
 
