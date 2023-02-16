@@ -5,7 +5,7 @@ plt.style.use('ggplot')
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 
-from linear_regression import LinearRegression
+from src.linear_regression import LinearRegression
 
 
 def cal_mse(y_true, y_pred):
