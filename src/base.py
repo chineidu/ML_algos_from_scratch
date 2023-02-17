@@ -7,7 +7,7 @@ class Model(ABC):
     """This is an abstract class for defining an ML model/algorithm."""
 
     @abstractmethod
-    def __repr__(self) -> None:
+    def __repr__(self) -> str:
         """This is used for printing the model signature."""
         pass
 
@@ -17,7 +17,7 @@ class Model(ABC):
         pass
 
     @abstractmethod
-    def predict(self, X: np.ndarray) -> None:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """This is used for making predictions using
         the trained model."""
         pass
