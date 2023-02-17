@@ -1,45 +1,61 @@
+from src import Model
 import numpy as np
 
-#### Logistic Regression (from scratch)
-class LogisticRegression:
-    def __init__(self, n_iters: int=10_000, learning_rate: int=0.0001):
+
+class LogisticRegression(Model):
+    """This is an implementation of Logistic Regression."""
+
+    def __init__(self, learning_rate: float = 0.001, n_iters: int = 1_000) -> None:
+        self.l_rate = learning_rate
         self.n_iters = n_iters
-        self.l_r = learning_rate
-        self.weights = 0
-        self.bias = 0
-        
-    def fit(self, X, y):
-        # set the parameters
+        self.weight = None
+        self.bias = None
+        self.THRESH = 0.5
+
+    def __repr__(self) -> str:
+        return (
+            f"{__class__.__name__}(learning_rate={self.learning_rate!r}, "
+            f"n_iters={self.n_iters:,})"
+        )
+
+    def fit(self, X=np.ndarray, y=np.ndarray) -> None:
         n_samples, n_features = X.shape
-        # assign the weights using the n_features
-        self.weights = np.zeros(n_features)
-        
-        # gradient descent
-        for _ in np.arange(self.n_iters):
-            y_lin = self.bias + np.dot(X, self.weights)
-            y_pred = self._sigmoid_func(y_lin)
-            
-            # comute the change in values
-            dw = (2 * np.dot(X.T, (y_pred - y))) / n_samples
-            db = (2 * np.sum(y_pred - y)) / n_samples
-            # update the values
-            self.weights -= self.l_r * dw 
-            self.bias -= self.l_r * db 
-            
-    def predict(self, X):
-        y_lin = self.bias + np.dot(X, self.weights)
-        y_pred = self._sigmoid_func(y_lin)
-        # make classifications
-        clf = [1 if i > 0.50 else 0 for i in y_pred]
-        return np.array(clf)
-    
-    def _sigmoid_func(self, val: int) -> int:
-        return 1 / (1 + np.exp(-val))
-    
-    def _accuracy(self,  y_true: np.array, y_pred: np.array) -> float:
-        """Calculate the model accuracy."""
-        acc = np.sum(y_true == y_pred) / len(y_true)
-        return round(acc, 2)
 
+        # Step 1: Initialize the weight and bias
+        self.weight = np.zeros((n_features))  # Vector
+        self.bias = 0  # Scalar
 
+        # Step 2: Estimate the y_value given the data points
+        # Note: shape of X: (n_samples, n_features) and shape of weight: (n_features, 1)
+        # Dot product: (A, B) x (B, C). i.e the inner dimensions MUST be equal.
+        # For more info check: https://numpy.org/doc/stable/reference/generated/numpy.dot.html
+        for _ in range(self.n_iters):
+            # Make predictions. Convert the continuous variable
+            # to a number between 0 and 1.
+            y_hat = np.dot(X, self.weight) + self.bias
+            y_pred = self.__sigmoid(y_hat)
 
+            # Step 3: Calculate the change in weight and bias values for each training
+            # example using gradient descent.
+            # shape of x_i: (1, n_features), shape of (y - y_hat): (1,) a rank1 array
+            # so we need to transpose x_i. so that shape of x_i.T: (n_features, 1)
+            # Note that np.dot also performs the summation.
+            dw = (1 / n_samples) * 2 * (np.dot(X.T, (y_pred - y)))
+            db = 2 * np.mean(y_pred - y)
+
+            # Step 4: Update the parameters
+            self.weight -= self.l_rate * dw
+            self.bias -= self.l_rate * db
+        return self
+
+    def __sigmoid(self, y_hat: float) -> float:
+        """This returns a number between 0 and 1."""
+        _y_pred = 1 / (1 + np.exp(-y_hat))
+        return _y_pred
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """This is used to make predictions."""
+        y_hat = np.dot(X, self.weight) + self.bias
+        _y_pred = self.__sigmoid(y_hat)
+        y_pred = [1 if val > self.THRESH else 0 for val in _y_pred]
+        return np.array(y_pred)
