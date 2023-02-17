@@ -5,7 +5,6 @@ import numpy as np
 from src import Model
 
 
-# pylint: disable=no-member
 class LogisticRegression(Model):
     """This is an implementation of Logistic Regression."""
 
@@ -17,10 +16,7 @@ class LogisticRegression(Model):
         self.THRESH = 0.5
 
     def __repr__(self) -> str:
-        return (
-            f"{__class__.__name__}(learning_rate={self.learning_rate!r}, "
-            f"n_iters={self.n_iters:,})"
-        )
+        return f"{__class__.__name__}(learning_rate={self.l_rate!r}, " f"n_iters={self.n_iters:,})"
 
     def fit(self, X=np.ndarray, y=np.ndarray) -> None:
         n_samples, n_features = X.shape
