@@ -1,7 +1,11 @@
-from src import Model
+"""This module is used to build Linear Regression from scratch."""
+
 import numpy as np
 
+from src import Model
 
+
+# pylint: disable=no-member
 class LogisticRegression(Model):
     """This is an implementation of Logistic Regression."""
 

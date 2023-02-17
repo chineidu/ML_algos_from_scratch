@@ -12,10 +12,12 @@ class NaiveBayes(Model):
         super().__init__()
         self.mean = None
         self.variance = None
-        self.prior = None
+        self.priors = None
+        self.classes = None
+        self.n_classes = None
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(prior={self.prior!r})"
+        return f"{self.__class__.__name__}(prior={self.priors!r})"
 
     def fit(self, X: np.ndarray, y=np.ndarray) -> None:
         n_samples, n_features = X.shape
@@ -53,12 +55,10 @@ class NaiveBayes(Model):
         """
         # After the iteration, the list has size = n_classes
         # i.e for both classes.
-        posteriors = list()
+        posteriors = []
         for cl_ in self.classes:
             log_prior = np.log(self.priors[cl_])
-            log_class_conditional_prob = np.sum(
-                np.log(self.__prob_density_func(x, cl_))
-            )
+            log_class_conditional_prob = np.sum(np.log(self.__prob_density_func(x, cl_)))
             posterior = log_class_conditional_prob + log_prior
             posteriors.append(posterior)
 

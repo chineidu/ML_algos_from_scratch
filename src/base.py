@@ -1,8 +1,10 @@
 """This module is contains the Abstract Base Class for building ML algotithms from scratch."""
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 
+# pylint: disable=unnecessary-pass
 class Model(ABC):
     """This is an abstract class for defining an ML model/algorithm."""
 
