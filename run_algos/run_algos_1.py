@@ -13,7 +13,7 @@ from src.naive_bayes import NaiveBayes
 def run_naive_bayes(verbose: int):
     """Train and evaluate the model."""
     # create a synthetic data
-    X, y = generate_mock_data(type_="regression")
+    X, y = generate_mock_data(type_="classification")
 
     # split the data
     X_train, X_test, y_train, y_test = train_test_split(
