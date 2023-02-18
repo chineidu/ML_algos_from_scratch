@@ -11,7 +11,7 @@ This is a linear approach to modelling the relationship between a scalar respons
 * Mean Squared Error (mse) is minimized in this algorithm using gradient descent.
 * *dw* and *db* are the change in weights and bias respectively.
 
-![linear](https://i.postimg.cc/wvWXvxSS/image.png)
+![linear](https://i.postimg.cc/x8Dmxsb1/image.png)
 
 ## Logistic Regression
 
