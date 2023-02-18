@@ -32,6 +32,7 @@ skip-string-normalization = true
 
 [tool.isort]
 skip = [".gitignore", ".dockerignore"]
+profile = "black"
 group_by_package = true
 multi_line_output = 3
 py_version=39
