@@ -1,4 +1,4 @@
-.PHONY: setup_venv run_lint run_style run_checks
+.PHONY: setup_venv run_lint run_style run_test run_checks
 
 setup_venv:
 	python3 -m venv venv && . venv/bin/activate \
@@ -12,5 +12,8 @@ run_lint:
 run_style:
 	. venv/bin/activate \
 	&& pylint --recursive=y src run_algos
+
+run_test:
+	. venv/bin/activate && pytest -svv
 
 run_checks: run_lint run_style
