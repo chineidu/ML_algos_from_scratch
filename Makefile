@@ -7,10 +7,10 @@ setup_venv:
 
 run_lint:
 	. venv/bin/activate \
-	&& black src && isort src
+	&& black src run_algos && isort src run_algos
 
 run_style:
 	. venv/bin/activate \
-	&& pylint --recursive=y src
+	&& pylint --recursive=y src run_algos
 
 run_checks: run_lint run_style
