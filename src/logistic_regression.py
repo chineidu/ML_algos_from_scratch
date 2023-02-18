@@ -33,7 +33,7 @@ class LogisticRegression(Model):
             # Make predictions. Convert the continuous variable
             # to a number between 0 and 1.
             y_hat = np.dot(X, self.weight) + self.bias
-            y_pred = self.__sigmoid(y_hat)
+            y_pred = self._sigmoid(y_hat)
 
             # Step 3: Calculate the change in weight and bias values for each training
             # example using gradient descent.
@@ -48,14 +48,14 @@ class LogisticRegression(Model):
             self.bias -= self.l_rate * db
         return self
 
-    def __sigmoid(self, y_hat: float) -> float:
-        """This returns a number between 0 and 1."""
+    def _sigmoid(self, y_hat: np.ndarray) -> np.ndarray:
+        """This returns a number between 0 and 1. in an array"""
         _y_pred = 1 / (1 + np.exp(-y_hat))
         return _y_pred
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """This is used to make predictions."""
         y_hat = np.dot(X, self.weight) + self.bias
-        _y_pred = self.__sigmoid(y_hat)
+        _y_pred = self._sigmoid(y_hat)
         y_pred = [1 if val > self.THRESH else 0 for val in _y_pred]
         return np.array(y_pred)
