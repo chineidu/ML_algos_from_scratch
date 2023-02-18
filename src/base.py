@@ -14,7 +14,7 @@ class Model(ABC):
         pass
 
     @abstractmethod
-    def fit(self, X: np.ndarray, y=np.ndarray) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         """This is used for training the model."""
         pass
 
