@@ -20,7 +20,7 @@ class LinearRegression(Model):
             f"n_iters={self.n_iters:,})"
         )
 
-    def fit(self, X=np.ndarray, y=np.ndarray) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
         n_samples, n_features = X.shape
 
         # Step 1: Initialize the weight and bias
