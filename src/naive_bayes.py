@@ -1,4 +1,4 @@
-"""This module is used to build Linear Regression from scratch."""
+"""This module is used to build Naive Bayes algorithm from scratch."""
 
 import numpy as np
 
