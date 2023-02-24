@@ -71,9 +71,10 @@ class BinaryTree:
         # If the value is less than the value at the node
         # traverse the left hand side of the tree until the
         # value is found otherwise the values is not present
+        # pylint: disable=no-else-return
         if value < self.node:
             if self.left:
-                self.left.search_tree(value=value)
+                return self.left.search_tree(value=value)
             else:
                 return f"{value} is not found!!!"
 
@@ -82,7 +83,7 @@ class BinaryTree:
         # value is found otherwise the values is not present
         if value > self.node:
             if self.right:
-                self.right.search_tree(value=value)
+                return self.right.search_tree(value=value)
             else:
                 return f"{value} is not found!!!"
 
@@ -91,5 +92,6 @@ if __name__ == '__main__':
     tree = BinaryTree(node=10)
     tree.insert_values(value=8)
     tree.insert_values(value=12)
-    print(tree)
-    print(BinaryTree.display_tree(tree))
+
+    print(tree.search_tree(value=1))
+    # print(BinaryTree.display_tree(tree))
