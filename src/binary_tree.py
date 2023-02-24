@@ -37,7 +37,7 @@ class BinaryTree:
         print(space * level + str(tree.node))
         BinaryTree.display_tree(tree.left, space, level + 1)
 
-    def insert_values(self, value: Union[int, float]) -> None:
+    def insert_values(self, *, value: Union[int, float]) -> None:
         """This is used to insert values into the Binary Tree.
 
         Note:
@@ -49,7 +49,7 @@ class BinaryTree:
             # If value is still less than the node,
             # move to the left and insert value recursively
             if self.left:
-                self.left.insert_values()
+                self.left.insert_values(value=value)
             else:
                 self.left = BinaryTree(node=value)
 
@@ -57,7 +57,39 @@ class BinaryTree:
             # If value is still greater than the node,
             # move to the right and insert value recursively
             if self.right:
-                self.right.insert_values()
+                self.right.insert_values(value=value)
             else:
                 self.right = BinaryTree(node=value)
         return self
+
+    def search_tree(self, *, value: Union[int, float]) -> str:
+        """This searches the Binary Tree using BST."""
+        # Base case
+        if value == self.node:
+            return f"{value} is present!"
+
+        # If the value is less than the value at the node
+        # traverse the left hand side of the tree until the
+        # value is found otherwise the values is not present
+        if value < self.node:
+            if self.left:
+                self.left.search_tree(value=value)
+            else:
+                return f"{value} is not found!!!"
+
+        # If the value is greater than the value at the node
+        # traverse the right hand side of the tree until the
+        # value is found otherwise the values is not present
+        if value > self.node:
+            if self.right:
+                self.right.search_tree(value=value)
+            else:
+                return f"{value} is not found!!!"
+
+
+if __name__ == '__main__':
+    tree = BinaryTree(node=10)
+    tree.insert_values(value=8)
+    tree.insert_values(value=12)
+    print(tree)
+    print(BinaryTree.display_tree(tree))
