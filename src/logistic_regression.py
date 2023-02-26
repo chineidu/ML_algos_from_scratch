@@ -49,7 +49,7 @@ class LogisticRegression(Model):
         return self
 
     def _sigmoid(self, y_hat: np.ndarray) -> np.ndarray:
-        """This returns a number between 0 and 1. in an array"""
+        """This returns a number between 0 and 1."""
         _y_pred = 1 / (1 + np.exp(-y_hat))
         return _y_pred
 
