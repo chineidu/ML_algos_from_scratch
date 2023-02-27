@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 from run_algos.utils import RANDOM_STATE, TEST_SIZE, generate_mock_data, visualize
+from src.decision_trees import DecisionTree
 from src.naive_bayes import NaiveBayes
 
 
@@ -45,5 +46,58 @@ def run_naive_bayes(verbose: int):
     return accuracy
 
 
+@click.command()
+@click.option(
+    "--min-num-samples",
+    help="The minimum number of samples required for splitting to occur",
+    default=10,
+)
+@click.option(
+    "--max-depth",
+    help="The maximum number of depth of the tree.",
+    default=100,
+)
+@click.option(
+    "--num-features",
+    help="The number of features to be used.",
+    default=None,
+)
+@click.option("-v", "--verbose", help="Increase the verbosity", count=True, default=0)
+def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
+    """Train and evaluate the model."""
+    # create a synthetic data
+    X, y = generate_mock_data(type_="classification")
+
+    # split the data
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=TEST_SIZE, random_state=RANDOM_STATE
+    )
+
+    # instantiate model
+    d_tree = DecisionTree(min_num_samples, max_depth, num_features)
+    if 1 <= verbose < 2:
+        click.echo(d_tree)
+        click.echo(f"Training data shape: {X_train.shape}\n")
+
+    if 2 <= verbose < 4:
+        # Visualize data
+        click.echo("Visualizing data ...\n")
+        visualize(X=X, y=y)
+
+    # train model
+    click.echo("=== Training the model ===")
+    d_tree.fit(X_train, y_train)
+
+    # make predictions
+    click.echo("=== Making predictions with the model ===")
+    y_pred = d_tree.predict(X_test)
+
+    click.echo("\n=== Evaluating the model performance ===")
+    accuracy = np.mean(y_pred == y_test)
+    click.echo(f"Accuracy: {accuracy}\n")
+    return accuracy
+
+
 if __name__ == "__main__":
-    run_naive_bayes()
+    # run_naive_bayes()
+    run_decision_trees()

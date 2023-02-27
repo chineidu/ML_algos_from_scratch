@@ -36,7 +36,7 @@ class DecisionTree(Model):
     def __init__(
         self,
         min_num_samples: int,
-        max_depth: Optional[int] = None,
+        max_depth: Optional[int] = 100,
         num_features: Optional[int] = None,
     ) -> None:
         super().__init__()
@@ -71,21 +71,22 @@ class DecisionTree(Model):
         # common label (class) i.e if we have samples < min_num_samples or
         # depth >= max_depth or if we have a pure node (a single class). i.e n_K == 1
         if n_samples < self.min_num_samples or depth >= self.max_depth or n_K == 1:
-            return Node(value=DecisionTree._most_common_label(y=y))
+            leaf_node = DecisionTree._most_common_label(y=y)
+            return Node(value=leaf_node)
 
-        # Add some randomness. Select features at random w/o replacement
+        # Add some randomness. Select features indices at random w/o replacement
         selected_features = np.random.choice(a=n_feats, size=self.num_features, replace=False)
 
         # Calculate the best split (using info gain)
-        best_feature, best_label_threshold = self._determine_best_split(selected_features)
+        best_feature, best_label_threshold = self._determine_best_split(X, y, selected_features)
 
         # Split into nodes using the best feature and label threshold
         left_node, right_node = DecisionTree._split_into_nodes(
-            X[:, best_feature], best_label_threshold
+            X=X[:, best_feature], best_label_threshold=best_label_threshold
         )
         # Recursively grow the tree
-        left = self._grow_tree(X[left_node], y[left_node], depth + 1)
-        right = self._grow_tree(X[right_node], y[right_node], depth + 1)
+        left = self._grow_tree(X[left_node, :], y[left_node], depth=depth + 1)
+        right = self._grow_tree(X[right_node, :], y[right_node], depth=depth + 1)
         return Node(left=left, right=right, feature=best_feature, threshold=best_label_threshold)
 
     @staticmethod
@@ -100,10 +101,13 @@ class DecisionTree(Model):
         """This is used to determine the best feature and threshold
         label for splitting a node using information gain.
 
-        X: 2-D array
-        features: 1-D array
+        Params:
+            X: 2-D array
+            features: 1-D array
         """
         best_feat, best_label_threshold = None, None
+        best_gain = -1  # (since it ranges from 0 to 1)
+
         # For each feature, determine the best_feature and best_label_threshold
         # that will be used for the split.
         for feat in features:
@@ -111,7 +115,6 @@ class DecisionTree(Model):
             all_labels = np.unique(current_X_arr)
 
             for thresh in all_labels:
-                best_gain = -1  # (since it ranges from 0 to 1)
                 # Compare the info gain with the best_gain and update the
                 # best_gain if possible (i.e when info_gain > best_gain)
                 # best_feat and best_label_threshold.
@@ -143,40 +146,43 @@ class DecisionTree(Model):
         parent_entropy = DecisionTree._calculate_entropy(y=y)
 
         # Calculate the entropy of the child nodes
-        left_node, right_node = DecisionTree._split_into_nodes(X, best_label_threshold)
+        left_idxs, right_idxs = DecisionTree._split_into_nodes(X, best_label_threshold)
+        num_left_idxs, num_rigft_idxs = len(left_idxs), len(right_idxs)
+
         # If you don't have binary branches there's no need to split the node w/that feature.
-        if len(left_node) == 0 or len(right_node) == 0:
+        if num_left_idxs == 0 or num_rigft_idxs == 0:
             info_gain = 0
 
-        weighted_left_entropy = (left_node / total_nodes) * DecisionTree._calculate_entropy(
-            y[left_node]
+        weighted_left_entropy = (num_left_idxs / total_nodes) * DecisionTree._calculate_entropy(
+            y[left_idxs]
         )
-        weighted_right_entropy = (left_node / total_nodes) * DecisionTree._calculate_entropy(
-            y[right_node]
+        weighted_right_entropy = (num_rigft_idxs / total_nodes) * DecisionTree._calculate_entropy(
+            y[right_idxs]
         )
         info_gain = parent_entropy - (weighted_left_entropy + weighted_right_entropy)
         return info_gain
 
     @staticmethod
-    def _split_into_nodes(X: np.ndarray, best_label_threshold: int) -> tuple(list[int], list[int]):
+    def _split_into_nodes(X: np.ndarray, best_label_threshold: int) -> tuple[list[int], list[int]]:
         """This is used to split the node into left and right nodes
         using X and best_label_threshold. It returns a tuple of lists
         which represent the observations.
 
-        X: 2-D array
-        best_label_threshold: int
+        Params:
+            X: 2-D array
+            best_label_threshold: int
         """
         # Select the indices of the array that satisfy the condition
-        left_node = np.argwhere(X <= best_label_threshold).flatten()
-        right_node = np.argwhere(X > best_label_threshold).flatten()
-        return (left_node, right_node)
+        left_idxs = np.argwhere(X <= best_label_threshold).flatten()
+        right_idxs = np.argwhere(X > best_label_threshold).flatten()
+        return (left_idxs, right_idxs)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         y_pred = [DecisionTree._traverse_tree(x=x_, node=self.root) for x_ in X]
         return np.array(y_pred)
 
     @staticmethod
-    def _traverse_tree(x: np.ndarray, node: Node):
+    def _traverse_tree(*, x: np.ndarray, node: Node):
         """This is used to traverse the DecisionTree nodes.
         It returns the predicted value for a given observation."""
         # Base case: If it's a leaf node:
@@ -185,6 +191,6 @@ class DecisionTree(Model):
 
         # If the value is less than the threshold, traverse left recursively
         if x[node.feature] <= node.threshold:
-            return DecisionTree._traverse_tree(node.left)
+            return DecisionTree._traverse_tree(x=x, node=node.left)
         # If the value is greater than the threshold, traverse right recursively
-        return DecisionTree._traverse_tree(node.right)
+        return DecisionTree._traverse_tree(x=x, node=node.right)
