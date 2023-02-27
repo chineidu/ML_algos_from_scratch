@@ -62,6 +62,7 @@ class DecisionTree(Model):
             n_feats if self.num_features is None else min(self.num_features, n_feats)
         )
         n_K = len(np.unique(y))
+
         # Base case: If one of the stopping criteria is met. Return the most
         # common label (class) i.e if we have samples < min_num_samples or
         # depth >= max_depth or if we have a pure node (a single class). i.e n_K == 1
@@ -122,22 +123,32 @@ class DecisionTree(Model):
     def _calculate_information_gain(
         self, X: np.ndarray, best_label_threshold: int, y: np.ndarray
     ) -> float:
-        """This returns the information gain of a feature."""
-        total_nodes = len(y)
+        """This returns the information gain of a feature.
+        It ranges between 0 and 1."""
+        total_nodes = X.shape[0]
         # Calculate the entropy of the parent
         parent_entropy = DecisionTree._calculate_entropy(y=y)
 
         # Calculate the entropy of the child nodes
         left_node, right_node = DecisionTree._split_into_nodes(X, best_label_threshold)
-        # left_entropy =
+        # If you don't have binary branches there's no need to split the node w/that feature.
+        if len(left_node) == 0 or len(right_node) == 0:
+            info_gain = 0
 
-        # right entropy =
-        return
+        weighted_left_entropy = (left_node / total_nodes) * DecisionTree._calculate_entropy(
+            y[left_node]
+        )
+        weighted_right_entropy = (left_node / total_nodes) * DecisionTree._calculate_entropy(
+            y[right_node]
+        )
+        info_gain = parent_entropy - (weighted_left_entropy + weighted_right_entropy)
+        return info_gain
 
     @staticmethod
     def _split_into_nodes(X: np.ndarray, best_label_threshold: int) -> tuple(list[int], list[int]):
         """This is used to split the node into left and right nodes
-        using the X_arr and best_label_threshold.
+        using X and best_label_threshold. It returns a tuple of lists
+        which represent the observations.
 
         X: 2-D array
         best_label_threshold: int
