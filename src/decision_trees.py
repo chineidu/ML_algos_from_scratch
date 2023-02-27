@@ -15,14 +15,16 @@ from src.base import Model
 class Node:
     """This is used to implement the nodes of a Decision Tree."""
 
-    def __init__(self, left, right, feature: int, threshold: int, *, value: int) -> None:
+    def __init__(
+        self, left, right, feature: int, threshold: int, *, value: Optional[int] = None
+    ) -> None:
         self.left = left
         self.right = right
         self.feature = feature
         self.threshold = threshold
         self.value = value
 
-    def _is_leaf_node(self) -> bool:
+    def is_leaf_node(self) -> bool:
         """This returns True if the Node is a leaf node
         otherwise, False."""
         return self.value is not None
@@ -41,6 +43,7 @@ class DecisionTree(Model):
         self.min_num_samples = min_num_samples
         self.max_depth = max_depth
         self.num_features = num_features
+        self.root = None
 
     def __repr__(self) -> str:
         return (
@@ -50,6 +53,7 @@ class DecisionTree(Model):
         )
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        self.root = self._grow_tree(X, y)
         return self
 
     def _grow_tree(self, X: np.ndarray, y: np.ndarray, depth: int = 0) -> None:
@@ -74,7 +78,15 @@ class DecisionTree(Model):
 
         # Calculate the best split (using info gain)
         best_feature, best_label_threshold = self._determine_best_split(selected_features)
-        pass
+
+        # Split into nodes using the best feature and label threshold
+        left_node, right_node = DecisionTree._split_into_nodes(
+            X[:, best_feature], best_label_threshold
+        )
+        # Recursively grow the tree
+        left = self._grow_tree(X[left_node], y[left_node], depth + 1)
+        right = self._grow_tree(X[right_node], y[right_node], depth + 1)
+        return Node(left=left, right=right, feature=best_feature, threshold=best_label_threshold)
 
     @staticmethod
     def _most_common_label(*, y: np.ndarray) -> int:
@@ -120,8 +132,9 @@ class DecisionTree(Model):
         entropy = -np.sum([(p_k * np.log2(p_k)) for p_k in probs if p_k > 0])
         return entropy
 
+    @staticmethod
     def _calculate_information_gain(
-        self, X: np.ndarray, best_label_threshold: int, y: np.ndarray
+        X: np.ndarray, best_label_threshold: int, y: np.ndarray
     ) -> float:
         """This returns the information gain of a feature.
         It ranges between 0 and 1."""
@@ -159,5 +172,19 @@ class DecisionTree(Model):
         return (left_node, right_node)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        pass
-        return
+        y_pred = [DecisionTree._traverse_tree(x=x_, node=self.root) for x_ in X]
+        return np.array(y_pred)
+
+    @staticmethod
+    def _traverse_tree(x: np.ndarray, node: Node):
+        """This is used to traverse the DecisionTree nodes.
+        It returns the predicted value for a given observation."""
+        # Base case: If it's a leaf node:
+        if node.is_leaf_node():
+            return node.value
+
+        # If the value is less than the threshold, traverse left recursively
+        if x[node.feature] <= node.threshold:
+            return DecisionTree._traverse_tree(node.left)
+        # If the value is greater than the threshold, traverse right recursively
+        return DecisionTree._traverse_tree(node.right)
