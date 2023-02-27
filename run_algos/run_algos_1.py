@@ -71,6 +71,7 @@ def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
 
     # instantiate model
     d_tree = DecisionTree(min_num_samples, max_depth, num_features)
+
     if 1 <= verbose < 2:
         click.echo(d_tree)
         click.echo(f"Training data shape: {X_train.shape}\n")
@@ -81,14 +82,15 @@ def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
         visualize(X=X, y=y)
 
     # train model
-    click.echo("=== Training the model ===")
+    click.echo("========== Training the model ==========")
     d_tree.fit(X_train, y_train)
+    click.echo(d_tree)
 
     # make predictions
-    click.echo("=== Making predictions with the model ===")
+    click.echo("========== Making predictions with the model ==========")
     y_pred = d_tree.predict(X_test)
 
-    click.echo("\n=== Evaluating the model performance ===")
+    click.echo("\n========== Evaluating the model performance ==========")
     accuracy = np.mean(y_pred == y_test)
     click.echo(f"Accuracy: {accuracy}\n")
     return accuracy
