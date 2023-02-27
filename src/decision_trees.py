@@ -16,7 +16,13 @@ class Node:
     """This is used to implement the nodes of a Decision Tree."""
 
     def __init__(
-        self, left, right, feature: int, threshold: int, *, value: Optional[int] = None
+        self,
+        left=None,
+        right=None,
+        feature: Optional[int] = None,
+        threshold: Optional[int] = None,
+        *,
+        value: Optional[int] = None,
     ) -> None:
         self.left = left
         self.right = right
@@ -35,19 +41,19 @@ class DecisionTree(Model):
 
     def __init__(
         self,
-        min_num_samples: int,
+        min_samples_split: int = 2,
         max_depth: Optional[int] = 100,
         num_features: Optional[int] = None,
     ) -> None:
         super().__init__()
-        self.min_num_samples = min_num_samples
+        self.min_samples_split = min_samples_split
         self.max_depth = max_depth
         self.num_features = num_features
         self.root = None
 
     def __repr__(self) -> str:
         return (
-            f"{self.__class__.__name__}(min_num_sample={self.min_num_samples} "
+            f"{self.__class__.__name__}(min_num_sample={self.min_samples_split} "
             f"max_depth={self.max_depth}, "
             f"num_features={self.num_features})"
         )
@@ -56,7 +62,7 @@ class DecisionTree(Model):
         self.root = self._grow_tree(X, y)
         return self
 
-    def _grow_tree(self, X: np.ndarray, y: np.ndarray, depth: int = 0) -> None:
+    def _grow_tree(self, X: np.ndarray, y: np.ndarray, depth: int = 0) -> Node:
         """This is used to recursively grow the tree.
         It returns a leaf node."""
         # Extract the some attributes from the input data.
@@ -68,9 +74,9 @@ class DecisionTree(Model):
         n_K = len(np.unique(y))
 
         # Base case: If one of the stopping criteria is met. Return the most
-        # common label (class) i.e if we have samples < min_num_samples or
+        # common label (class) i.e if we have samples < min_samples_split or
         # depth >= max_depth or if we have a pure node (a single class). i.e n_K == 1
-        if n_samples < self.min_num_samples or depth >= self.max_depth or n_K == 1:
+        if n_samples < self.min_samples_split or depth >= self.max_depth or n_K == 1:
             leaf_node = DecisionTree._most_common_label(y=y)
             return Node(value=leaf_node)
 
@@ -78,15 +84,17 @@ class DecisionTree(Model):
         selected_features = np.random.choice(a=n_feats, size=self.num_features, replace=False)
 
         # Calculate the best split (using info gain)
-        best_feature, best_label_threshold = self._determine_best_split(X, y, selected_features)
+        best_feature, best_label_threshold = DecisionTree._determine_best_split(
+            X, y, selected_features
+        )
 
         # Split into nodes using the best feature and label threshold
-        left_node, right_node = DecisionTree._split_into_nodes(
+        left_idxs, right_idxs = DecisionTree._split_into_nodes(
             X=X[:, best_feature], best_label_threshold=best_label_threshold
         )
         # Recursively grow the tree
-        left = self._grow_tree(X[left_node, :], y[left_node], depth=depth + 1)
-        right = self._grow_tree(X[right_node, :], y[right_node], depth=depth + 1)
+        left = self._grow_tree(X[left_idxs, :], y[left_idxs], depth=depth + 1)
+        right = self._grow_tree(X[right_idxs, :], y[right_idxs], depth=depth + 1)
         return Node(left=left, right=right, feature=best_feature, threshold=best_label_threshold)
 
     @staticmethod
@@ -118,9 +126,7 @@ class DecisionTree(Model):
                 # Compare the info gain with the best_gain and update the
                 # best_gain if possible (i.e when info_gain > best_gain)
                 # best_feat and best_label_threshold.
-                info_gain = DecisionTree._calculate_information_gain(
-                    current_X_arr, best_label_threshold, y
-                )
+                info_gain = DecisionTree._calculate_information_gain(current_X_arr, thresh, y)
                 if info_gain > best_gain:
                     best_gain = info_gain
                     best_feat, best_label_threshold = feat, thresh
@@ -185,7 +191,7 @@ class DecisionTree(Model):
     def _traverse_tree(*, x: np.ndarray, node: Node):
         """This is used to traverse the DecisionTree nodes.
         It returns the predicted value for a given observation."""
-        # Base case: If it's a leaf node:
+        # Base case: If it's a leaf node
         if node.is_leaf_node():
             return node.value
 

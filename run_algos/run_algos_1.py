@@ -50,18 +50,14 @@ def run_naive_bayes(verbose: int):
 @click.option(
     "--min-num-samples",
     help="The minimum number of samples required for splitting to occur",
-    default=10,
+    default=2,
 )
 @click.option(
     "--max-depth",
     help="The maximum number of depth of the tree.",
     default=100,
 )
-@click.option(
-    "--num-features",
-    help="The number of features to be used.",
-    default=None,
-)
+@click.option("--num-features", help="The number of features to be used.", default=None, type=int)
 @click.option("-v", "--verbose", help="Increase the verbosity", count=True, default=0)
 def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
     """Train and evaluate the model."""
