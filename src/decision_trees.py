@@ -85,12 +85,12 @@ class DecisionTree(Model):
 
         # Calculate the best split (using info gain)
         best_feature, best_label_threshold = DecisionTree._determine_best_split(
-            X, y, selected_features
+            X=X, y=y, features=selected_features
         )
 
         # Split into nodes using the best feature and label threshold
         left_idxs, right_idxs = DecisionTree._split_into_nodes(
-            X=X[:, best_feature], best_label_threshold=best_label_threshold
+            X=X[:, best_feature], label_threshold=best_label_threshold
         )
         # Recursively grow the tree
         left = self._grow_tree(X[left_idxs, :], y[left_idxs], depth=depth + 1)
@@ -105,7 +105,7 @@ class DecisionTree(Model):
         return label
 
     @staticmethod
-    def _determine_best_split(X: np.ndarray, y: np.ndarray, features: np.ndarray):
+    def _determine_best_split(*, X: np.ndarray, y: np.ndarray, features: np.ndarray):
         """This is used to determine the best feature and threshold
         label for splitting a node using information gain.
 
@@ -126,7 +126,9 @@ class DecisionTree(Model):
                 # Compare the info gain with the best_gain and update the
                 # best_gain if possible (i.e when info_gain > best_gain)
                 # best_feat and best_label_threshold.
-                info_gain = DecisionTree._calculate_information_gain(current_X_arr, thresh, y)
+                info_gain = DecisionTree._calculate_information_gain(
+                    X=current_X_arr, label_threshold=thresh, y=y
+                )
                 if info_gain > best_gain:
                     best_gain = info_gain
                     best_feat, best_label_threshold = feat, thresh
@@ -142,9 +144,7 @@ class DecisionTree(Model):
         return entropy
 
     @staticmethod
-    def _calculate_information_gain(
-        X: np.ndarray, best_label_threshold: int, y: np.ndarray
-    ) -> float:
+    def _calculate_information_gain(*, X: np.ndarray, label_threshold: int, y: np.ndarray) -> float:
         """This returns the information gain of a feature.
         It ranges between 0 and 1."""
         total_nodes = X.shape[0]
@@ -152,7 +152,7 @@ class DecisionTree(Model):
         parent_entropy = DecisionTree._calculate_entropy(y=y)
 
         # Calculate the entropy of the child nodes
-        left_idxs, right_idxs = DecisionTree._split_into_nodes(X, best_label_threshold)
+        left_idxs, right_idxs = DecisionTree._split_into_nodes(X=X, label_threshold=label_threshold)
         num_left_idxs, num_rigft_idxs = len(left_idxs), len(right_idxs)
 
         # If you don't have binary branches there's no need to split the node w/that feature.
@@ -169,18 +169,18 @@ class DecisionTree(Model):
         return info_gain
 
     @staticmethod
-    def _split_into_nodes(X: np.ndarray, best_label_threshold: int) -> tuple[list[int], list[int]]:
+    def _split_into_nodes(*, X: np.ndarray, label_threshold: int) -> tuple[list[int], list[int]]:
         """This is used to split the node into left and right nodes
         using X and best_label_threshold. It returns a tuple of lists
         which represent the observations.
 
         Params:
             X: 2-D array
-            best_label_threshold: int
+            label_threshold: int
         """
         # Select the indices of the array that satisfy the condition
-        left_idxs = np.argwhere(X <= best_label_threshold).flatten()
-        right_idxs = np.argwhere(X > best_label_threshold).flatten()
+        left_idxs = np.argwhere(X <= label_threshold).flatten()
+        right_idxs = np.argwhere(X > label_threshold).flatten()
         return (left_idxs, right_idxs)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
