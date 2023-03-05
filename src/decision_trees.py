@@ -6,11 +6,6 @@ import numpy as np
 
 from src.base import Model
 
-# pylint: disable=unnecessary-pass
-# pylint: disable=unused-variable
-# pylint: disable=useless-return
-# pylint: disable=assignment-from-none
-
 
 class Node:
     """This is used to implement the nodes of a Decision Tree."""
