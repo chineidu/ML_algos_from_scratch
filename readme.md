@@ -10,7 +10,9 @@ The following algorithms have been implemented:
 
 ## 3. [Naive Bayes' Classifier](https://github.com/chineidu/ML_algos_from_scratch/blob/main/src/naive_bayes.py)
 
-## 4. [Decision Trees Classifier]()
+## 4. [Decision Trees Classifier](https://github.com/chineidu/ML_algos_from_scratch/blob/main/src/decision_trees.py)
+
+## 5. [Multi-nomial Naive Bayes](https://github.com/chineidu/ML_algos_from_scratch/blob/main/src/multinomial_nb.py)
 
 ## Linear Regression
 
