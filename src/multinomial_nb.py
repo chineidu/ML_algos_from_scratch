@@ -6,7 +6,7 @@ from typing import Any, Union
 import numpy as np
 import pandas as pd
 
-from base import Model
+from src import Model
 
 
 # pylint: disable=too-many-locals
@@ -39,8 +39,7 @@ class MultiNomial_NB(Model):
             f"priors={priors_dict})"
         )
 
-    def fitt(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
-        """This is used for training the model."""
+    def fit(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
         # Since we have 2 class labels, we need to initialize and
         # create 2 models. Compute count and log probs for each model.
         # Retrieve the probabilities
