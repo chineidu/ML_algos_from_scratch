@@ -1,5 +1,6 @@
 """This module is contains the Abstract Base Class for building ML algotithms from scratch."""
 from abc import ABC, abstractmethod
+from typing import Any, Union
 
 import numpy as np
 
@@ -14,12 +15,12 @@ class Model(ABC):
         pass
 
     @abstractmethod
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
         """This is used for training the model."""
         return self
 
     @abstractmethod
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(self, X: Union[np.ndarray, Any]) -> np.ndarray:
         """This is used for making predictions using
         the trained model."""
         pass
