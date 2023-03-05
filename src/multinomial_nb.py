@@ -188,8 +188,6 @@ class MultiNomial_NB(Model):
         return log_prob
 
     def predict(self, X: list[int]) -> None:
-        """This is used for making predictions using
-        the trained model."""
         # Instantiate
         predictions = np.zeros(shape=(len(X)))
 
