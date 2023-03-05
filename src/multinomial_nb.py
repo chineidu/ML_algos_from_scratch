@@ -22,6 +22,7 @@ class MultiNomial_NB(Model):
     """
 
     def __init__(self, *, vocab: dict) -> None:
+        super().__init__()
         self.vocab = vocab
         self.transition_matrix = None
         self.initial_state_distr = None
@@ -40,9 +41,10 @@ class MultiNomial_NB(Model):
         )
 
     def fit(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
+        """This is used for training the model."""
         # Since we have 2 class labels, we need to initialize and
         # create 2 models. Compute count and log probs for each model.
-        # Retrieve the probs
+        # Retrieve the probabilities
         A_0, Pi_0 = self._init_A_and_Pi()
         A_1, Pi_1 = self._init_A_and_Pi()
         k_0, k_1 = np.unique(y)
@@ -188,6 +190,8 @@ class MultiNomial_NB(Model):
         return log_prob
 
     def predict(self, X: list[int]) -> None:
+        """This is used for making predictions using
+        the trained model."""
         # Instantiate
         predictions = np.zeros(shape=(len(X)))
 
