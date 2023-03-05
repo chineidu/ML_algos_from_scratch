@@ -22,7 +22,6 @@ class MultiNomial_NB(Model):
     """
 
     def __init__(self, *, vocab: dict) -> None:
-        super().__init__()
         self.vocab = vocab
         self.transition_matrix = None
         self.initial_state_distr = None
@@ -40,7 +39,7 @@ class MultiNomial_NB(Model):
             f"priors={priors_dict})"
         )
 
-    def fit(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
+    def fitt(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
         """This is used for training the model."""
         # Since we have 2 class labels, we need to initialize and
         # create 2 models. Compute count and log probs for each model.
