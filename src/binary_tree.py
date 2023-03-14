@@ -1,4 +1,4 @@
-"""This module is used to build Binary Tree from scratch."""
+"""This module is used to build a Binary Tree from scratch."""
 from typing import Any, NewType, Union
 
 Tree = NewType("Tree", tp=Any)
