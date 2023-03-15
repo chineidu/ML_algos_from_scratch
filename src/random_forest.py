@@ -14,7 +14,7 @@ class RandomForest(Model):
     def __init__(
         self,
         min_samples_split: int = 2,
-        max_depth: int = 100,
+        max_depth: int = 50,
         n_features: int = None,
         n_trees: int = 20,
         *args,
