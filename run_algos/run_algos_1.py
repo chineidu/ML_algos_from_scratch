@@ -59,7 +59,7 @@ def run_naive_bayes(verbose: int):
 )
 @click.option("--num-features", help="The number of features to be used.", default=None, type=int)
 @click.option("-v", "--verbose", help="Increase the verbosity", count=True, default=0)
-def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
+def run_decision_trees(min_num_samples, max_depth, n_features, verbose: int):
     """Train and evaluate the model."""
     # create a synthetic data
     X, y = generate_mock_data(type_="classification")
@@ -70,7 +70,7 @@ def run_decision_trees(min_num_samples, max_depth, num_features, verbose: int):
     )
 
     # instantiate model
-    d_tree = DecisionTree(min_num_samples, max_depth, num_features)
+    d_tree = DecisionTree(min_num_samples, max_depth, n_features)
 
     if 1 <= verbose < 2:
         click.echo(d_tree)

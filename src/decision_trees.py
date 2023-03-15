@@ -38,19 +38,19 @@ class DecisionTree(Model):
         self,
         min_samples_split: int = 2,
         max_depth: Optional[int] = 100,
-        num_features: Optional[int] = None,
+        n_features: Optional[int] = None,
     ) -> None:
         super().__init__()
         self.min_samples_split = min_samples_split
         self.max_depth = max_depth
-        self.num_features = num_features
+        self.n_features = n_features
         self.root = None
 
     def __repr__(self) -> str:
         return (
             f"{self.__class__.__name__}(min_num_sample={self.min_samples_split} "
             f"max_depth={self.max_depth}, "
-            f"num_features={self.num_features})"
+            f"n_features={self.n_features})"
         )
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
@@ -61,11 +61,9 @@ class DecisionTree(Model):
         """This is used to recursively grow the tree.
         It returns a leaf node."""
         # Extract the some attributes from the input data.
-        # Verify that the num_features is valid!
+        # Verify that the n_features is valid!
         n_samples, n_feats = X.shape
-        self.num_features = (
-            n_feats if self.num_features is None else min(self.num_features, n_feats)
-        )
+        self.n_features = n_feats if self.n_features is None else min(self.n_features, n_feats)
         n_K = len(np.unique(y))
 
         # Base case: If one of the stopping criteria is met. Return the most
@@ -76,7 +74,7 @@ class DecisionTree(Model):
             return Node(value=leaf_node)
 
         # Add some randomness. Select features indices at random w/o replacement
-        selected_features = np.random.choice(a=n_feats, size=self.num_features, replace=False)
+        selected_features = np.random.choice(a=n_feats, size=self.n_features, replace=False)
 
         # Calculate the best split (using info gain)
         best_feature, best_label_threshold = DecisionTree._determine_best_split(
