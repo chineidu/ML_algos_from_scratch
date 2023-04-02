@@ -1,9 +1,10 @@
 """This module is used to build Multi-nomial Naive Bayes
 algorithm from scratch."""
 
-from typing import Any, Union
+from typing import Union
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 
 from src import Model
@@ -21,7 +22,7 @@ class MultiNomial_NB(Model):
         None
     """
 
-    def __init__(self, *, vocab: dict) -> None:
+    def __init__(self, *, vocab: dict[str, int]) -> None:
         self.vocab = vocab
         self.transition_matrix = None
         self.initial_state_distr = None
@@ -31,15 +32,17 @@ class MultiNomial_NB(Model):
 
     def __repr__(self) -> str:
         priors_dict = {
-            self.K[0]: round(self.priors[0], 2),
-            self.K[1]: round(self.priors[1], 2),
+            self.K[0]: round(self.priors[0], 2),  # type: ignore
+            self.K[1]: round(self.priors[1], 2),  # type: ignore
         }
         return (
-            f"{__class__.__name__}(log_priors={self.log_priors[0], self.log_priors[1]}, "
+            f"{self.__class__.__name__}(log_priors={self.log_priors[0], self.log_priors[1]}, "
             f"priors={priors_dict})"
         )
 
-    def fit(self, X: Union[np.ndarray, Any], y: Union[np.ndarray, Any]) -> None:
+    def fit(
+        self, X: npt.NDArray[Union[np.int_, np.float_]], y: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> None:
         # Since we have 2 class labels, we need to initialize and
         # create 2 models. Compute count and log probs for each model.
         # Retrieve the probabilities
@@ -50,26 +53,28 @@ class MultiNomial_NB(Model):
 
         # Model 0
         input_0 = self._get_input(tokenized_doc=X, y=y, k_=k_0)
-        A_hat_0, Pi_hat_0 = self._count_state_transitions(X=input_0, A_hat=A_0, Pi_hat=Pi_0)
-        log_A_hat_0, log_Pi_hat_0 = self._convert_counts_to_log_prob(
-            X=input_0, A_hat=A_hat_0, Pi_hat=Pi_hat_0
+        A_hat_0, Pi_hat_0 = self._count_state_transitions(X=input_0, A_hat=A_0, Pi_hat=Pi_0)  # type: ignore
+        log_A_hat_0, log_Pi_hat_0 = self._convert_counts_to_log_prob(  # type: ignore
+            X=input_0, A_hat=A_hat_0, Pi_hat=Pi_hat_0  # type: ignore
         )
 
         # Model 1
         input_1 = self._get_input(tokenized_doc=X, y=y, k_=k_1)
-        A_hat_1, Pi_hat_1 = self._count_state_transitions(X=input_1, A_hat=A_1, Pi_hat=Pi_1)
-        log_A_hat_1, log_Pi_hat_1 = self._convert_counts_to_log_prob(
-            X=input_1, A_hat=A_hat_1, Pi_hat=Pi_hat_1
+        A_hat_1, Pi_hat_1 = self._count_state_transitions(X=input_1, A_hat=A_1, Pi_hat=Pi_1)  # type: ignore
+        log_A_hat_1, log_Pi_hat_1 = self._convert_counts_to_log_prob(  # type: ignore
+            X=input_1, A_hat=A_hat_1, Pi_hat=Pi_hat_1  # type: ignore
         )
 
-        self.transition_matrix = (log_A_hat_0, log_A_hat_1)
-        self.initial_state_distr = (log_Pi_hat_0, log_Pi_hat_1)
-        self.log_priors = (log_y0, log_y1)
-        self.K = k_0, k_1
+        self.transition_matrix = (log_A_hat_0, log_A_hat_1)  # type: ignore
+        self.initial_state_distr = (log_Pi_hat_0, log_Pi_hat_1)  # type: ignore
+        self.log_priors = (log_y0, log_y1)  # type: ignore
+        self.K = k_0, k_1  # type: ignore
 
-        return self
+        return self  # type: ignore
 
-    def _init_A_and_Pi(self) -> tuple:
+    def _init_A_and_Pi(
+        self,
+    ) -> tuple[npt.NDArray[Union[np.int_, np.float_]], npt.NDArray[Union[np.int_, np.float_]]]:
         """This is used to initialize the state transition matrix
         and the initial state distribution."""
         V = len(self.vocab)
@@ -117,7 +122,7 @@ class MultiNomial_NB(Model):
     @staticmethod
     def _count_state_transitions(
         *, X: list[int], A_hat: np.ndarray, Pi_hat: np.ndarray
-    ) -> tuple[np.ndarray]:
+    ) -> tuple[npt.NDArray[Union[np.int_, np.float_]], npt.NDArray[Union[np.int_, np.float_]]]:
         """This is used to count the occurrences of transitions.
         i.e calculate the counts of A_hat and Pi_hat.
 
@@ -134,7 +139,7 @@ class MultiNomial_NB(Model):
         # Note: Update the prev_state after each transition.
         for tokenized_doc in X:
             prev_token = None
-            for curr_token in tokenized_doc:
+            for curr_token in tokenized_doc:  # type: ignore
                 if prev_token is None:
                     Pi_hat[curr_token] += 1
                 else:
@@ -149,7 +154,7 @@ class MultiNomial_NB(Model):
         X: Union[np.ndarray, pd.Series],
         A_hat: np.ndarray,
         Pi_hat: np.ndarray,
-    ) -> tuple[np.ndarray]:
+    ) -> tuple[npt.NDArray[Union[np.int_, np.float_]], npt.NDArray[Union[np.int_, np.float_]]]:
         """This is used to calculate the log of the class conditional
         probability given a specific class label. It returns a tuple
         of arrays containing the log probabilities.
@@ -162,14 +167,14 @@ class MultiNomial_NB(Model):
         Pi_hat /= Pi_hat.sum(axis=0)
         return (np.log(A_hat), np.log(Pi_hat))
 
-    def _calculate_log_likelihoods(self, *, x: list[int], k_: int) -> tuple[np.ndarray]:
+    def _calculate_log_likelihoods(self, *, x: list[int], k_: int) -> float:
         """This is used to extract the log probability given the log
         probabililty and class label of the tokenized document.
 
         Returns:
-            (log(A_hat), log(Pi_hat))
+            log_prob (float): The log of the probability.
         """
-        log_A_hat, log_Pi_hat = self.transition_matrix[k_], self.initial_state_distr[k_]
+        log_A_hat, log_Pi_hat = self.transition_matrix[k_], self.initial_state_distr[k_]  # type: ignore
 
         # Calculate the probability:
         # if it's an initial state (prev_idx is None), retrieve the probability
@@ -187,7 +192,9 @@ class MultiNomial_NB(Model):
             prev_idx = curr_idx
         return log_prob
 
-    def predict(self, X: list[int]) -> None:
+    def predict(
+        self, X: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> npt.NDArray[Union[np.int_, np.float_]]:
         # Instantiate
         predictions = np.zeros(shape=(len(X)))
 
@@ -201,7 +208,7 @@ class MultiNomial_NB(Model):
         for idx, sentence in enumerate(X):
             # Posteriors = posterior_k_0 and posterior_k_1
             posteriors = [
-                (self._calculate_log_likelihoods(x=sentence, k_=k_) + self.log_priors[k_])
+                (self._calculate_log_likelihoods(x=sentence, k_=k_) + self.log_priors[k_])  # type: ignore
                 for k_ in self.K
             ]
             pred = np.argmax(posteriors)

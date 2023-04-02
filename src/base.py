@@ -1,7 +1,10 @@
 """This module is contains the Abstract Base Class for building ML algotithms from scratch."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Union
+
+import numpy as np
+import numpy.typing as npt
 
 
 # pylint: disable=unnecessary-pass
@@ -14,12 +17,16 @@ class Model(ABC):
         pass
 
     @abstractmethod
-    def fit(self, X: Any, y: Any) -> None:
+    def fit(
+        self, X: npt.NDArray[Union[np.int_, np.float_]], y: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> None:
         """This is used for training the model."""
         pass
 
     @abstractmethod
-    def predict(self, X: Any, y: Any) -> None:
+    def predict(
+        self, X: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> npt.NDArray[Union[np.int_, np.float_]]:
         """This is used for making predictions using
         the trained model."""
         pass

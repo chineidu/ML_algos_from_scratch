@@ -1,6 +1,8 @@
 """This module is used to build Logistic Regression from scratch."""
+from typing import Union
 
 import numpy as np
+import numpy.typing as npt
 
 from src import Model
 
@@ -16,14 +18,19 @@ class LogisticRegression(Model):
         self.THRESH = 0.5
 
     def __repr__(self) -> str:
-        return f"{__class__.__name__}(learning_rate={self.l_rate!r}, " f"n_iters={self.n_iters:,})"
+        return (
+            f"{self.__class__.__name__}(learning_rate={self.l_rate!r}, "
+            f"n_iters={self.n_iters:,})"
+        )
 
-    def fit(self, X=np.ndarray, y=np.ndarray) -> None:
+    def fit(
+        self, X: npt.NDArray[Union[np.int_, np.float_]], y: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> None:
         n_samples, n_features = X.shape
 
         # Step 1: Initialize the weight and bias
         self.weight = np.zeros((n_features))  # Vector
-        self.bias = 0  # Scalar
+        self.bias = 0  # type: ignore
 
         # Step 2: Estimate the y_value given the data points
         # Note: shape of X: (n_samples, n_features) and shape of weight: (n_features, 1)
@@ -46,14 +53,16 @@ class LogisticRegression(Model):
             # Step 4: Update the parameters
             self.weight -= self.l_rate * dw
             self.bias -= self.l_rate * db
-        return self
+        return self  # type: ignore
 
     def _sigmoid(self, y_hat: np.ndarray) -> np.ndarray:
         """This returns a number between 0 and 1."""
         _y_pred = 1 / (1 + np.exp(-y_hat))
         return _y_pred
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(
+        self, X: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> npt.NDArray[Union[np.int_, np.float_]]:
         """This is used to make predictions."""
         y_hat = np.dot(X, self.weight) + self.bias
         _y_pred = self._sigmoid(y_hat)

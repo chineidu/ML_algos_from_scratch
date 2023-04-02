@@ -1,6 +1,8 @@
 """This module is used to build Linear Regression from scratch."""
+from typing import Union
 
 import numpy as np
+import numpy.typing as npt
 
 from src import Model
 
@@ -16,16 +18,18 @@ class LinearRegression(Model):
 
     def __repr__(self) -> str:
         return (
-            f"{__class__.__name__}(learning_rate={self.learning_rate!r}, "
+            f"{self.__class__.__name__}(learning_rate={self.learning_rate!r}, "
             f"n_iters={self.n_iters:,})"
         )
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+    def fit(
+        self, X: npt.NDArray[Union[np.int_, np.float_]], y: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> None:
         n_samples, n_features = X.shape
 
         # Step 1: Initialize the weight and bias
         self.weight = np.zeros((n_features))  # Vector
-        self.bias = 0  # Scalar
+        self.bias = 0  # type: ignore
 
         # Step 2: Estimate the y_value given the data points
         # Note: shape of X: (n_samples, n_features) and shape of weight: (n_features, 1)
@@ -45,9 +49,11 @@ class LinearRegression(Model):
             # Step 4: Update the parameters
             self.weight -= self.learning_rate * dw
             self.bias -= self.learning_rate * db
-        return self
+        return self  # type: ignore
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
+    def predict(
+        self, X: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> npt.NDArray[Union[np.int_, np.float_]]:
         # Step 5. Use the updated parameters to make predictions.
         y_pred = np.dot(X, self.weight) + self.bias
         return y_pred
