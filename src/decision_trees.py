@@ -1,8 +1,9 @@
 """This module is used to implement Decision Trees from scratch."""
 from collections import Counter
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
+import numpy.typing as npt
 
 from src.base import Model
 
@@ -53,11 +54,18 @@ class DecisionTree(Model):
             f"n_features={self.n_features})"
         )
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
-        self.root = self._grow_tree(X, y)
-        return self
+    def fit(
+        self, X: npt.NDArray[Union[np.int_, np.float_]], y: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> None:
+        self.root = self._grow_tree(X, y)  # type: ignore
+        return self  # type: ignore
 
-    def _grow_tree(self, X: np.ndarray, y: np.ndarray, depth: int = 0) -> Node:
+    def _grow_tree(
+        self,
+        X: npt.NDArray[Union[np.int_, np.float_]],
+        y: npt.NDArray[Union[np.int_, np.float_]],
+        depth: int = 0,
+    ) -> Node:
         """This is used to recursively grow the tree.
         It returns a leaf node."""
         # Extract the some attributes from the input data.
@@ -69,7 +77,7 @@ class DecisionTree(Model):
         # Base case: If one of the stopping criteria is met. Return the most
         # common label (class) i.e if we have samples < min_samples_split or
         # depth >= max_depth or if we have a pure node (a single class). i.e n_K == 1
-        if n_samples < self.min_samples_split or depth >= self.max_depth or n_K == 1:
+        if n_samples < self.min_samples_split or depth >= self.max_depth or n_K == 1:  # type: ignore
             leaf_node = DecisionTree._most_common_label(y=y)
             return Node(value=leaf_node)
 
@@ -91,14 +99,19 @@ class DecisionTree(Model):
         return Node(left=left, right=right, feature=best_feature, threshold=best_label_threshold)
 
     @staticmethod
-    def _most_common_label(*, y: np.ndarray) -> int:
+    def _most_common_label(*, y: Union[npt.NDArray[Union[np.int_, np.float_]], list[int]]) -> int:
         """This is used to determine the most common label at a node."""
         counts = Counter(y)
         label = counts.most_common(n=1)[0][0]
         return label
 
     @staticmethod
-    def _determine_best_split(*, X: np.ndarray, y: np.ndarray, features: np.ndarray):
+    def _determine_best_split(
+        *,
+        X: npt.NDArray[Union[np.int_, np.float_]],
+        y: npt.NDArray[Union[np.int_, np.float_]],
+        features: npt.NDArray[np.int_],
+    ):
         """This is used to determine the best feature and threshold
         label for splitting a node using information gain.
 
@@ -123,21 +136,26 @@ class DecisionTree(Model):
                     X=current_X_arr, label_threshold=thresh, y=y
                 )
                 if info_gain > best_gain:
-                    best_gain = info_gain
+                    best_gain = info_gain  # type: ignore
                     best_feat, best_label_threshold = feat, thresh
 
         return best_feat, best_label_threshold
 
     @staticmethod
-    def _calculate_entropy(y: np.ndarray) -> float:
+    def _calculate_entropy(y: npt.NDArray[Union[np.int_, np.float_]]) -> float:
         """This is used to calculate the entropy at a node."""
         total, counts = len(y), np.bincount(y)
-        probs: list[float] = counts / total
+        probs: list[float] = counts / total  # type: ignore
         entropy = -np.sum([(p_k * np.log2(p_k)) for p_k in probs if p_k > 0])
         return entropy
 
     @staticmethod
-    def _calculate_information_gain(*, X: np.ndarray, label_threshold: int, y: np.ndarray) -> float:
+    def _calculate_information_gain(
+        *,
+        X: npt.NDArray[Union[np.int_, np.float_]],
+        label_threshold: int,
+        y: npt.NDArray[Union[np.int_, np.float_]],
+    ) -> float:
         """This returns the information gain of a feature.
         It ranges between 0 and 1."""
         total_nodes = X.shape[0]
@@ -145,7 +163,7 @@ class DecisionTree(Model):
         parent_entropy = DecisionTree._calculate_entropy(y=y)
 
         # Calculate the entropy of the child nodes
-        left_idxs, right_idxs = DecisionTree._split_into_nodes(X=X, label_threshold=label_threshold)
+        left_idxs, right_idxs = DecisionTree._split_into_nodes(X=X, label_threshold=label_threshold)  # type: ignore
         num_left_idxs, num_rigft_idxs = len(left_idxs), len(right_idxs)
 
         # If you don't have binary branches there's no need to split the node w/that feature.
@@ -158,11 +176,13 @@ class DecisionTree(Model):
         weighted_right_entropy = (num_rigft_idxs / total_nodes) * DecisionTree._calculate_entropy(
             y[right_idxs]
         )
-        info_gain = parent_entropy - (weighted_left_entropy + weighted_right_entropy)
+        info_gain = parent_entropy - (weighted_left_entropy + weighted_right_entropy)  # type: ignore
         return info_gain
 
     @staticmethod
-    def _split_into_nodes(*, X: np.ndarray, label_threshold: int) -> tuple[list[int], list[int]]:
+    def _split_into_nodes(
+        *, X: npt.NDArray[np.int_], label_threshold: int
+    ) -> tuple[list[int], list[int]]:
         """This is used to split the node into left and right nodes
         using X and best_label_threshold. It returns a tuple of lists
         which represent the observations.
@@ -174,14 +194,16 @@ class DecisionTree(Model):
         # Select the indices of the array that satisfy the condition
         left_idxs = np.argwhere(X <= label_threshold).flatten()
         right_idxs = np.argwhere(X > label_threshold).flatten()
-        return (left_idxs, right_idxs)
+        return (left_idxs, right_idxs)  # type: ignore
 
-    def predict(self, X: np.ndarray) -> np.ndarray:
-        y_pred = [DecisionTree._traverse_tree(x=x_, node=self.root) for x_ in X]
+    def predict(
+        self, X: npt.NDArray[Union[np.int_, np.float_]]
+    ) -> npt.NDArray[Union[np.int_, np.float_]]:
+        y_pred = [DecisionTree._traverse_tree(x=x_, node=self.root) for x_ in X]  # type: ignore
         return np.array(y_pred)
 
     @staticmethod
-    def _traverse_tree(*, x: np.ndarray, node: Node):
+    def _traverse_tree(*, x: npt.NDArray[np.int_], node: Node):
         """This is used to traverse the DecisionTree nodes.
         It returns the predicted value for a given observation."""
         # Base case: If it's a leaf node
@@ -189,7 +211,7 @@ class DecisionTree(Model):
             return node.value
 
         # If the value is less than the threshold, traverse left recursively
-        if x[node.feature] <= node.threshold:
+        if x[node.feature] <= node.threshold:  # type: ignore
             return DecisionTree._traverse_tree(x=x, node=node.left)
         # If the value is greater than the threshold, traverse right recursively
         return DecisionTree._traverse_tree(x=x, node=node.right)
